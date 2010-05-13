@@ -44,8 +44,8 @@ module OAuth
         
         unless @token.invalidated?    
           if request.post? 
-            if user_authorizes_token?
-              @token.authorize!(current_user)
+            if person_authorizes_token?
+              @token.authorize!(current_person)
               if @token.oauth10?
                 @redirect_url = URI.parse(params[:oauth_callback] || @token.client_application.callback_url)
               else
@@ -78,7 +78,7 @@ module OAuth
       end
 
       def revoke
-        @token = current_user.tokens.find_by_token params[:token]
+        @token = current_person.tokens.find_by_token params[:token]
         if @token
           @token.invalidate!
           flash[:notice] = "You've revoked the token for #{@token.client_application.name}"
@@ -109,7 +109,7 @@ module OAuth
       protected
       
       # Override this to match your authorization page form
-      def user_authorizes_token?
+      def person_authorizes_token?
         params[:authorize] == '1'
       end
     end
