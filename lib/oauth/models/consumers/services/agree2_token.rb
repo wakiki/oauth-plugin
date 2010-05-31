@@ -10,6 +10,6 @@ class Agree2Token < ConsumerToken
   end
   
   def client
-    @client||=Agree2Token.agree2_client.user(token,secret)
+    @client||=Agree2Token.agree2_client.person(token,secret)
   end
 end

@@ -2,7 +2,7 @@
 # or subclasses ConsumerToken with the name.
 #
 # So an entry called "my_service" will create a class MyServiceToken which you can 
-# connect with has_one to your user model.
+# connect with has_one to your person model.
 if defined? ConsumerToken && defined? OAUTH_CREDENTIALS
   OAUTH_CREDENTIALS.each do |key, value|
     class_name=value[:class_name]||"#{key.to_s.classify}Token"

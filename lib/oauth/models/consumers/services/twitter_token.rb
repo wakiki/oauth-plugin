@@ -1,5 +1,7 @@
 require 'twitter'
 class TwitterToken < ConsumerToken
+  belongs_to :person
+  
   TWITTER_SETTINGS={:site=>"http://twitter.com"}
   def self.consumer
     @consumer||=OAuth::Consumer.new credentials[:key],credentials[:secret],TWITTER_SETTINGS
