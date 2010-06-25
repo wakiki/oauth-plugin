@@ -1,4 +1,4 @@
-require 'json'
+# require 'json'
 module Oauth
   module Models
     module Consumers
