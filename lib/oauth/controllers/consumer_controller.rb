@@ -20,8 +20,8 @@ module Oauth
       # If person is already connected it displays a page with an option to disconnect and redo
       def show
         unless @token
-          @request_token=@consumer.get_request_token(callback_oauth_consumer_url(params[:id]))
-          session[@request_token.token]=@request_token.secret
+          @request_token = @consumer.get_request_token(callback_oauth_consumer_url(params[:id]))
+          session[@request_token.token] = @request_token.secret
           if @request_token.callback_confirmed?
             redirect_to @request_token.authorize_url
           else
@@ -31,18 +31,25 @@ module Oauth
       end
 
       def callback
-        @request_token_secret=session[params[:oauth_token]]
+        @request_token_secret = session[ params[:oauth_token] ]
         if @request_token_secret
-          @token=@consumer.create_from_request_token(current_person,params[:oauth_token],@request_token_secret,params[:oauth_verifier])
-          if @token
-            flash[:notice] = "#{params[:id].humanize} was successfully connected to your account"
-            go_back
-          else
-            flash[:error] = "An error happened, please try connecting again"
-            redirect_to oauth_consumer_url(params[:id])
-          end
+          begin
+            session[ params[:oauth_token] ] = nil  # stops session getting full if multiple attempts
+            @token = @consumer.create_from_request_token( current_person, params[:oauth_token], @request_token_secret, params[:oauth_verifier] )
+            if @token
+              flash[:notice] = "#{params[:id].humanize} was successfully connected to your account"
+              go_back
+            else
+              flash[:error] = "An error happened, please try connecting again"
+              redirect_to oauth_consumer_url(params[:id])
+            end
+          rescue OAuth::Unauthorized
+            render :text => "Sorry, authorisation failed or declined. Close this window and try again."
+          end            
+        else
+          flash[:error] = "Missing oauth session token"
+          redirect_to blank_path
         end
-
       end
 
       def destroy
@@ -52,8 +59,7 @@ module Oauth
           redirect_to oauth_consumer_url(params[:id])
         else
           flash[:notice] = "#{params[:id].humanize} was successfully disconnected from your account"
-          
-          go_back
+          redirect_to oauth_consumers_path
         end
       end
 
